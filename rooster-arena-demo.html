@@ -1,0 +1,915 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rooster Arena Animatic</title>
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #11110f;
+        --ink: #f3eadc;
+        --muted: #a99c8a;
+        --line: rgba(243, 234, 220, 0.17);
+        --accent: #f0b34a;
+        --red: #bd3b27;
+        --green: #3f6a4e;
+        --blue: #263d59;
+        --panel: #191814;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100svh;
+        background:
+          linear-gradient(90deg, rgba(240, 179, 74, 0.06), transparent 34%),
+          linear-gradient(180deg, #171510, #0d0d0c 72%);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+      }
+
+      .topbar {
+        position: fixed;
+        inset: 0 0 auto 0;
+        z-index: 20;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 16px;
+        align-items: center;
+        height: 64px;
+        padding: 0 28px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(17, 17, 15, 0.72);
+        backdrop-filter: blur(18px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: baseline;
+        min-width: 0;
+        gap: 12px;
+        white-space: nowrap;
+      }
+
+      .brand strong {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0;
+      }
+
+      .brand span,
+      .counter {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .rail {
+        position: fixed;
+        inset: 64px 0 auto 0;
+        z-index: 21;
+        height: 2px;
+        background: rgba(243, 234, 220, 0.1);
+      }
+
+      .rail span {
+        display: block;
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--red));
+        transition: width 140ms linear;
+      }
+
+      main {
+        padding-top: 64px;
+      }
+
+      .shot {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(280px, 0.72fr) minmax(320px, 0.56fr);
+        min-height: calc(100svh - 64px);
+        border-bottom: 1px solid var(--line);
+        scroll-snap-align: start;
+        overflow: hidden;
+      }
+
+      .final-cut {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(280px, 0.56fr) minmax(320px, 0.58fr);
+        gap: min(5vw, 58px);
+        align-items: center;
+        min-height: calc(100svh - 64px);
+        padding: 44px min(5vw, 72px);
+        border-bottom: 1px solid var(--line);
+        overflow: hidden;
+      }
+
+      .final-cut::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0.24;
+        background:
+          radial-gradient(circle at 28% 28%, rgba(240, 179, 74, 0.18), transparent 30%),
+          radial-gradient(circle at 76% 64%, rgba(189, 59, 39, 0.16), transparent 34%);
+        pointer-events: none;
+      }
+
+      .final-video-wrap,
+      .final-copy {
+        position: relative;
+        z-index: 1;
+      }
+
+      .final-video-wrap {
+        justify-self: center;
+        width: min(420px, 80vw);
+        aspect-ratio: 9 / 16;
+        overflow: hidden;
+        border: 1px solid rgba(243, 234, 220, 0.24);
+        border-radius: 8px;
+        background: #070706;
+        box-shadow: 0 26px 90px rgba(0, 0, 0, 0.46);
+      }
+
+      .final-video-wrap video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .overview {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(320px, 0.92fr) minmax(280px, 0.46fr);
+        gap: min(5vw, 64px);
+        align-items: center;
+        min-height: calc(100svh - 64px);
+        padding: 46px min(5vw, 72px);
+        border-bottom: 1px solid var(--line);
+        overflow: hidden;
+      }
+
+      .overview::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0.22;
+        background:
+          linear-gradient(135deg, rgba(240, 179, 74, 0.11), transparent 48%),
+          radial-gradient(circle at 72% 38%, rgba(189, 59, 39, 0.18), transparent 32%);
+        pointer-events: none;
+      }
+
+      .overview-media,
+      .overview-copy {
+        position: relative;
+        z-index: 1;
+      }
+
+      .overview-media img {
+        display: block;
+        width: 100%;
+        max-height: calc(100svh - 150px);
+        object-fit: contain;
+        border: 1px solid rgba(243, 234, 220, 0.2);
+        border-radius: 8px;
+        background: #090908;
+        box-shadow: 0 26px 90px rgba(0, 0, 0, 0.46);
+      }
+
+      .overview-copy h1 {
+        max-width: 520px;
+      }
+
+      .voice-panel {
+        position: relative;
+        z-index: 1;
+        grid-column: 1 / -1;
+        display: grid;
+        gap: 14px;
+        max-width: 980px;
+        padding-top: 6px;
+      }
+
+      .voice-panel h2 {
+        margin: 0;
+        font-size: 22px;
+        line-height: 1.15;
+      }
+
+      .voice-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .voice-sample {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        background: rgba(25, 24, 20, 0.78);
+      }
+
+      .voice-sample strong {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 13px;
+        text-transform: uppercase;
+      }
+
+      .voice-sample audio {
+        display: block;
+        width: 100%;
+        height: 34px;
+      }
+
+      .shot::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0.22;
+        background:
+          linear-gradient(135deg, transparent 0 60%, rgba(240, 179, 74, 0.1)),
+          radial-gradient(circle at 70% 35%, rgba(189, 59, 39, 0.18), transparent 33%);
+        pointer-events: none;
+      }
+
+      .visual {
+        position: sticky;
+        top: 64px;
+        display: grid;
+        place-items: center;
+        min-height: calc(100svh - 64px);
+        padding: 38px;
+      }
+
+      .phone {
+        position: relative;
+        width: min(420px, 78vw);
+        max-height: calc(100svh - 140px);
+        aspect-ratio: 9 / 16;
+        overflow: hidden;
+        border: 1px solid rgba(243, 234, 220, 0.24);
+        border-radius: 8px;
+        background: #0a0a09;
+        box-shadow: 0 26px 90px rgba(0, 0, 0, 0.46);
+      }
+
+      .poster {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        background:
+          linear-gradient(180deg, rgba(38, 61, 89, 0.42), transparent 28%),
+          linear-gradient(0deg, rgba(17, 17, 15, 0.92), transparent 44%),
+          #17130f;
+      }
+
+      .poster img,
+      .poster video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scale(1.02);
+      }
+
+      .poster video {
+        display: block;
+      }
+
+      .poster.image-tint img {
+        filter: saturate(0.86) contrast(1.05) brightness(0.86);
+      }
+
+      .sketch {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        background:
+          linear-gradient(180deg, rgba(24, 35, 50, 0.86), rgba(18, 16, 13, 0.95)),
+          #15120f;
+      }
+
+      .sketch::before,
+      .sketch::after {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .wake::before {
+        inset: 9% 12% auto auto;
+        width: 36%;
+        height: 24%;
+        background: linear-gradient(135deg, rgba(240, 179, 74, 0.88), rgba(243, 234, 220, 0.18));
+        clip-path: polygon(0 0, 100% 8%, 84% 100%, 16% 88%);
+      }
+
+      .wake::after {
+        left: 26%;
+        bottom: 15%;
+        width: 45%;
+        height: 48%;
+        border-radius: 50% 50% 12% 12%;
+        background:
+          radial-gradient(circle at 50% 18%, var(--red) 0 13%, transparent 14%),
+          linear-gradient(180deg, #b43726, #5b1d18 58%, #1d1714);
+        box-shadow: 28px 92px 0 rgba(240, 179, 74, 0.22);
+      }
+
+      .flashback {
+        background:
+          linear-gradient(180deg, rgba(63, 106, 78, 0.58), rgba(20, 18, 15, 0.98)),
+          repeating-linear-gradient(105deg, transparent 0 24px, rgba(243, 234, 220, 0.05) 24px 26px);
+      }
+
+      .flashback::before {
+        left: 14%;
+        top: 18%;
+        width: 72%;
+        height: 48%;
+        border: 1px solid rgba(243, 234, 220, 0.24);
+        background: rgba(8, 11, 10, 0.32);
+        transform: rotate(-3deg);
+      }
+
+      .flashback::after {
+        right: 10%;
+        top: 9%;
+        width: 42%;
+        height: 12%;
+        background: rgba(243, 234, 220, 0.18);
+        clip-path: polygon(0 46%, 38% 40%, 48% 0, 58% 40%, 100% 48%, 58% 56%, 48% 100%, 38% 58%);
+      }
+
+      .arena::before {
+        inset: 12% 7% auto 7%;
+        height: 36%;
+        border: 1px solid rgba(243, 234, 220, 0.2);
+        border-bottom: 14px solid rgba(121, 87, 48, 0.72);
+        border-radius: 50% 50% 0 0;
+      }
+
+      .arena::after {
+        left: 28%;
+        bottom: 18%;
+        width: 42%;
+        height: 28%;
+        background: linear-gradient(180deg, #57402c, #1f1914);
+        clip-path: polygon(10% 34%, 50% 0, 90% 34%, 82% 100%, 18% 100%);
+      }
+
+      .cosmic {
+        background:
+          radial-gradient(circle at 56% 44%, rgba(240, 179, 74, 0.94) 0 3%, transparent 4%),
+          radial-gradient(circle at 68% 28%, rgba(243, 234, 220, 0.72) 0 1%, transparent 2%),
+          radial-gradient(circle at 28% 22%, rgba(243, 234, 220, 0.62) 0 1%, transparent 2%),
+          linear-gradient(180deg, #111b30, #09090f 72%);
+      }
+
+      .cosmic::before {
+        left: 5%;
+        top: 48%;
+        width: 108%;
+        height: 9%;
+        background: linear-gradient(90deg, transparent, rgba(240, 179, 74, 0.96), rgba(243, 234, 220, 0.95), transparent);
+        transform: rotate(-17deg);
+        filter: blur(1px);
+      }
+
+      .cosmic::after {
+        right: 14%;
+        top: 19%;
+        width: 28%;
+        height: 16%;
+        border: 2px solid rgba(240, 179, 74, 0.72);
+        border-radius: 50%;
+        box-shadow:
+          0 0 0 12px rgba(240, 179, 74, 0.08),
+          0 0 44px rgba(240, 179, 74, 0.48);
+      }
+
+      .blackout {
+        background: #020202;
+      }
+
+      .blackout::before {
+        left: 18%;
+        top: 24%;
+        width: 64%;
+        height: 18%;
+        border-bottom: 3px solid rgba(243, 234, 220, 0.35);
+        transform: rotate(-16deg);
+      }
+
+      .caption {
+        position: absolute;
+        left: 18px;
+        right: 18px;
+        bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        color: rgba(243, 234, 220, 0.78);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0;
+      }
+
+      .copy {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: calc(100svh - 64px);
+        padding: 72px min(7vw, 84px) 72px 24px;
+      }
+
+      .num {
+        color: var(--accent);
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+        letter-spacing: 0;
+        line-height: 0.96;
+        overflow-wrap: normal;
+      }
+
+      h1 {
+        max-width: 620px;
+        font-size: clamp(42px, 5vw, 68px);
+      }
+
+      h2 {
+        max-width: 600px;
+        margin-top: 18px;
+        font-size: clamp(36px, 4.5vw, 60px);
+      }
+
+      p {
+        max-width: 560px;
+        margin: 22px 0 0;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.55;
+      }
+
+      .beat {
+        max-width: 560px;
+        margin-top: 30px;
+        padding-top: 22px;
+        border-top: 1px solid var(--line);
+        color: rgba(243, 234, 220, 0.86);
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      .dialogue {
+        display: inline-block;
+        margin-top: 34px;
+        color: var(--accent);
+        font-size: clamp(34px, 5.2vw, 72px);
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .active .phone {
+        border-color: rgba(240, 179, 74, 0.68);
+      }
+
+      .active .poster img {
+        animation: breathe 5s ease-in-out infinite;
+      }
+
+      .active .sketch::before,
+      .active .sketch::after {
+        animation: pulse 4s ease-in-out infinite;
+      }
+
+      @keyframes breathe {
+        0%,
+        100% {
+          transform: scale(1.02);
+        }
+        50% {
+          transform: scale(1.055);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.72;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 880px) {
+        .topbar {
+          height: 58px;
+          padding: 0 16px;
+        }
+
+        .brand span {
+          display: none;
+        }
+
+        .rail {
+          top: 58px;
+        }
+
+        main {
+          padding-top: 58px;
+        }
+
+        .shot {
+          grid-template-columns: 1fr;
+          min-height: auto;
+        }
+
+        .final-cut {
+          grid-template-columns: 1fr;
+          gap: 26px;
+          min-height: auto;
+          padding: 22px 16px 44px;
+        }
+
+        .final-video-wrap {
+          width: min(82vw, 360px);
+        }
+
+        .overview {
+          grid-template-columns: 1fr;
+          gap: 26px;
+          min-height: auto;
+          padding: 22px 16px 44px;
+        }
+
+        .overview-media img {
+          max-height: none;
+        }
+
+        .voice-list {
+          grid-template-columns: 1fr;
+        }
+
+        .visual {
+          position: relative;
+          top: 0;
+          min-height: auto;
+          padding: 22px 16px 8px;
+        }
+
+        .phone {
+          width: min(82vw, 360px);
+          max-height: none;
+        }
+
+        .copy {
+          min-height: auto;
+          padding: 26px 20px 52px;
+        }
+
+        h1 {
+          font-size: 42px;
+        }
+
+        h2 {
+          font-size: 36px;
+        }
+
+        p {
+          font-size: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <strong>Rooster Arena</strong>
+        <span>vertical animatic</span>
+      </div>
+      <div class="counter"><span id="activeShot">00</span> / 08</div>
+    </header>
+    <div class="rail" aria-hidden="true"><span id="progress"></span></div>
+
+    <main>
+      <section class="final-cut">
+        <div class="final-video-wrap">
+          <video
+            src="rooster-remotion.mp4"
+            controls
+            playsinline
+            preload="metadata"
+          ></video>
+        </div>
+        <div class="final-copy">
+          <span class="num">CUT</span>
+          <h1>Собранный монтаж</h1>
+          <p>Remotion-версия с 5-секундной заставкой Дананград Продакшен, v3 dramatic на начале, обработанным v3 shout под выстрел, замедлением, эхом и текстом поверх кадра.</p>
+          <div class="beat">Видео не запускается само: нажми play, чтобы оценить синхрон голоса, титров и удара луча.</div>
+        </div>
+      </section>
+
+      <section class="overview">
+        <div class="overview-media">
+          <img src="public/rooster/storyboard-grid-v3.png" alt="Общий лист раскадровки в ровной сетке" />
+        </div>
+        <div class="overview-copy">
+          <span class="num">00</span>
+          <h1>Вся раскадровка</h1>
+          <p>Сначала общий лист для быстрой оценки темпа и слабых мест. Ниже та же история идёт по одному кадру с подписью и монтажным битом.</p>
+          <div class="beat">Сетка без подписей и полей: порядок слева направо, сверху вниз. Финал остановлен на благодати, без сцены с тапком.</div>
+        </div>
+        <div class="voice-panel">
+          <h2>Варианты голоса</h2>
+          <div class="voice-list">
+            <div class="voice-sample">
+              <strong>00 intro</strong>
+              <audio controls preload="metadata" src="public/rooster/audio/00-danangrad-intro-heavy.mp3"></audio>
+            </div>
+            <div class="voice-sample">
+              <strong>music bed</strong>
+              <audio controls preload="metadata" src="public/rooster/audio/music-suno-dimon-boss.mp3"></audio>
+            </div>
+            <div class="voice-sample">
+              <strong>01 wake</strong>
+              <audio controls preload="metadata" src="public/rooster/audio/01-wakeup-fight-day-v3.mp3"></audio>
+            </div>
+            <div class="voice-sample">
+              <strong>02 past</strong>
+              <audio controls preload="metadata" src="public/rooster/audio/02-past-v3.mp3"></audio>
+            </div>
+            <div class="voice-sample">
+              <strong>03 arena</strong>
+              <audio controls preload="metadata" src="public/rooster/audio/03-arena-ready-v3.mp3"></audio>
+            </div>
+            <div class="voice-sample">
+              <strong>04 strong</strong>
+              <audio controls preload="metadata" src="public/rooster/audio/04-strong-v3.mp3"></audio>
+            </div>
+            <div class="voice-sample">
+              <strong>05 day</strong>
+              <audio controls preload="metadata" src="public/rooster/audio/05-day-chief-v3.mp3"></audio>
+            </div>
+            <div class="voice-sample">
+              <strong>06 shout</strong>
+              <audio controls preload="metadata" src="public/rooster/audio/crow-v3-shout-epic.mp3"></audio>
+            </div>
+            <div class="voice-sample">
+              <strong>07 grace</strong>
+              <audio controls preload="metadata" src="public/rooster/audio/07-grace-main-v3.mp3"></audio>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="shot active" data-shot="00">
+        <div class="visual">
+          <div class="phone">
+            <div class="poster">
+              <video
+                src="public/rooster/video/00-danangrad-kling.mp4"
+                poster="public/rooster/00-danangrad-intro.png"
+                controls
+                playsinline
+                preload="metadata"
+              ></video>
+            </div>
+            <div class="caption"><span>00</span><span>studio ident</span></div>
+          </div>
+        </div>
+        <div class="copy">
+          <span class="num">00</span>
+          <h1>Дананград Продакшен</h1>
+          <p>Темная кинозаставка перед историей: эмблема, дым, золотой свет и тяжелый мужской голос.</p>
+          <div class="beat">ДАНАНГ! ГРАД! Продакшен представляет!</div>
+        </div>
+      </section>
+
+      <section class="shot" data-shot="01">
+        <div class="visual">
+          <div class="phone">
+            <div class="poster">
+              <video
+                src="public/rooster/video/01-wake-kling.mp4"
+                poster="public/rooster/01-wake.png"
+                controls
+                playsinline
+                preload="metadata"
+              ></video>
+            </div>
+            <div class="caption"><span>01</span><span>dawn room video</span></div>
+          </div>
+        </div>
+        <div class="copy">
+          <span class="num">01</span>
+          <h1>Петух просыпается</h1>
+          <p>Глаза открываются резко, как у бойца перед финальным раундом. Косуха висит рядом, комната ещё сонная, но тело уже знает: сегодня будет бой.</p>
+          <div class="beat">Камера медленно давит на лицо. Свет из ставен режет темноту. Первый вдох, короткая пауза, рывок с кровати.</div>
+        </div>
+      </section>
+
+      <section class="shot" data-shot="02">
+        <div class="visual">
+          <div class="phone">
+            <div class="poster">
+              <video
+                src="public/rooster/video/02-jacket-kling.mp4"
+                poster="public/rooster/02-jacket-flashbacks.png"
+                controls
+                playsinline
+                preload="metadata"
+              ></video>
+            </div>
+            <div class="caption"><span>02</span><span>leather / memory</span></div>
+          </div>
+        </div>
+        <div class="copy">
+          <span class="num">02</span>
+          <h2>Косуха и флешбеки</h2>
+          <p>Он надевает чёрную косуху. В зеркале вспыхивают обрывки памяти: джунгли, дождь, силуэты, вертолётная тень, без крови и прямого реализма.</p>
+          <div class="beat">Лицо переходит из растерянного в собранное. Взгляд перестаёт бегать. Он сжимает кулаки.</div>
+        </div>
+      </section>
+
+      <section class="shot" data-shot="03">
+        <div class="visual">
+          <div class="phone">
+            <div class="poster">
+              <video
+                src="public/rooster/video/03-arena-kling.mp4"
+                poster="public/rooster/03-arena-reveal.png"
+                controls
+                playsinline
+                preload="metadata"
+              ></video>
+            </div>
+            <div class="caption"><span>03</span><span>village coliseum</span></div>
+          </div>
+        </div>
+        <div class="copy">
+          <span class="num">03</span>
+          <h2>Деревня становится ареной</h2>
+          <p>Он выходит к обычному забору, но вокруг уже не двор: огромные деревянные трибуны, земляной участок, старый дом и забор в самом центре.</p>
+          <div class="beat">Камера идёт за спиной, потом поднимается вверх и открывает невозможный масштаб.</div>
+        </div>
+      </section>
+
+      <section class="shot" data-shot="04">
+        <div class="visual">
+          <div class="phone">
+            <div class="poster">
+              <video
+                src="public/rooster/video/04-jacket-off-kling.mp4"
+                poster="public/rooster/04-jacket-off.png"
+                controls
+                playsinline
+                preload="metadata"
+              ></video>
+            </div>
+            <div class="caption"><span>04</span><span>corner crew</span></div>
+          </div>
+        </div>
+        <div class="copy">
+          <span class="num">04</span>
+          <h2>С него снимают косуху</h2>
+          <p>Две взрослые кошкодевушки работают как corner crew перед чемпионским поединком. Петух стоит в центре арены, толпа ревёт, пыль светится в прожекторах.</p>
+          <div class="beat">Косуха уходит с плеч одним ритуальным движением. Он не моргает.</div>
+        </div>
+      </section>
+
+      <section class="shot" data-shot="05">
+        <div class="visual">
+          <div class="phone">
+            <div class="poster">
+              <video
+                src="public/rooster/video/05-eyes-charge-kling.mp4"
+                poster="public/rooster/05-eyes-charge.png"
+                controls
+                playsinline
+                preload="metadata"
+              ></video>
+            </div>
+            <div class="caption"><span>05</span><span>charge</span></div>
+          </div>
+        </div>
+        <div class="copy">
+          <span class="num">05</span>
+          <h2>Глаза вспыхивают</h2>
+          <p>Он встаёт на две ноги и собирает силу, будто запускает фаербол, но источник не в руках. Источник в груди, клюве и древней злости.</p>
+          <div class="beat">Пыль, перья и воздух начинают втягиваться к нему. Толпа понимает, что сейчас будет не спорт.</div>
+        </div>
+      </section>
+
+      <section class="shot" data-shot="06">
+        <div class="visual">
+          <div class="phone">
+            <div class="poster">
+              <video
+                src="public/rooster/video/06-beam-up-kling.mp4"
+                poster="public/rooster/06-beam-up.png"
+                controls
+                playsinline
+                preload="metadata"
+              ></video>
+            </div>
+            <div class="caption"><span>06</span><span>cosmic crow</span></div>
+          </div>
+        </div>
+        <div class="copy">
+          <span class="num">06</span>
+          <h2>Луч в небо</h2>
+          <p>В тот же момент и тем же ракурсом он раскрывает накопленную силу: руки вверх, клюв открыт, золотой столб пробивает небо.</p>
+          <span class="dialogue">КУКАРЕКУ, ЁПТА!</span>
+        </div>
+      </section>
+
+      <section class="shot" data-shot="07">
+        <div class="visual">
+          <div class="phone">
+            <div class="poster">
+              <video
+                src="public/rooster/video/07-sun-impact-kling.mp4"
+                poster="public/rooster/07-sun-impact.png"
+                controls
+                playsinline
+                preload="metadata"
+              ></video>
+            </div>
+            <div class="caption"><span>07</span><span>star impact</span></div>
+          </div>
+        </div>
+        <div class="copy">
+          <span class="num">07</span>
+          <h2>За пределами галактики</h2>
+          <p>За пределами галактики камера стоит у солнца: перед ним расколотые планеты, а из темноты в солнце прилетает тот самый луч.</p>
+          <div class="beat">Это отдельный космический кадр без петуха: солнце, разломанные планеты, луч из чёрной глубины.</div>
+        </div>
+      </section>
+
+    </main>
+
+    <script>
+      const shots = [...document.querySelectorAll(".shot")];
+      const activeShot = document.getElementById("activeShot");
+      const progress = document.getElementById("progress");
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+          if (!visible) return;
+          shots.forEach((shot) => shot.classList.toggle("active", shot === visible.target));
+          activeShot.textContent = visible.target.dataset.shot;
+
+          document.querySelectorAll("video").forEach((video) => {
+            if (!visible.target.contains(video)) {
+              video.pause();
+              video.currentTime = 0;
+            }
+          });
+        },
+        { threshold: [0.42, 0.58, 0.74] },
+      );
+
+      shots.forEach((shot) => observer.observe(shot));
+
+      window.addEventListener(
+        "scroll",
+        () => {
+          const max = document.documentElement.scrollHeight - window.innerHeight;
+          const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+          progress.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+        },
+        { passive: true },
+      );
+    </script>
+  </body>
+</html>
